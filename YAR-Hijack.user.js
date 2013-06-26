@@ -4,6 +4,7 @@
 // @namespace     http://www.gamerswastelands.co.za/clicker
 // @include        http://www.kingsofchaos.com/recruit.php
 // @include        http://www.kingsofchaos.com/recruit.php?*
+// @require         https://raw.github.com/DonatoB/tofu/master/server/libs/jquery-1.8.3.min.js
 // ==/UserScript==
 */
 
@@ -18,6 +19,7 @@ var invalidResponse = 0;
 var myUniqid;
 var myStatsid;
 const REPORT_THRESHOLD = 50;
+var sessionClicks = 0;
 var successfulClicks = [];
 var alreadyClicked = [];
 
@@ -44,6 +46,7 @@ var cpmStatusBox;
 var imageStatusBox;
 var moraleStatusBox;
 var alreadyClickedStatusBox;
+var sessionClicksBox;
 var serverStatusBox;
 
 var recruiterResponseField;
@@ -134,6 +137,17 @@ function teaDecrypt(v, k) {
 })();
 // END OBFUSCATION ROUTINES
 
+	function addCommas(sValue) { //"addCommas function wrote by Lukas Brueckner..." thanks =) but not really true ^.^
+
+	sValue = String(sValue);
+    	var sRegExp = new RegExp('(-?[0-9]+)([0-9]{3})');
+    	
+    	while(sRegExp.test(sValue)) {
+    		sValue = sValue.replace(sRegExp, '$1,$2');
+    	}
+    	return sValue;
+    }
+    
 function updateServerStatus() {
   if ('dying' == serverStatusBox.textContent) return;
 
@@ -417,8 +431,10 @@ function getNextCaptchaImage() {
 }
 
 function reportSuccessfulClick(uniqid) {
-  successfulClicks.push(uniqid);
-  maybeReportClicks();
+	sessionClicksBox.textContent = sessionClicks;
+
+	successfulClicks.push(uniqid);
+	maybeReportClicks();
 }
 
 function reportAlreadyClicked(uniqid) {
@@ -598,6 +614,9 @@ function maybeSendRecruiterResponse(e) {
         imageBox.removeChild(captchaObject.img);
         sendRecruiterResponse(captchaObject, letter);
         ++clickCount;
+        ++sessionClicks;
+		sessionClicksBox.textContent = sessionClicks;
+
       }
       break;
     default:
@@ -683,7 +702,7 @@ function initializeRecruiter() {
               '#mainBox {' +
               '  margin: 12px auto 0;' +
               '  width: 1110px;' +
-              '  height: 7.5em;' +
+              '  height: 9em;' +
               '  padding: 5px;' +
               '  border: 1px solid #777;' +
               '  background-color: #222;' +
@@ -785,6 +804,7 @@ function initializeRecruiter() {
       '  <div style="float: left; width: 300px; height: 100%;' +
       '              border-right: 1px solid #777">' +
       '    CPM: <span id="cpmStatusBox">0</span><br>' +
+      '    Session Clicks: <span id="sessionClicksBox">0</span><br>' +
       '    Loaded: <span id="imageStatusBox">0</span><br>' +
       '    Queued links: <span id="linkListLength">0</span><br>' +
       '    Morale: <span id="moraleStatusBox">-</span><br>' +
@@ -796,6 +816,7 @@ function initializeRecruiter() {
       '    Total Clicked: <span id="totalclickStatusBox">0</span><br>' +
       '    Clicked today: <span id="todayclickStatusBox">0</span><br>' +
       '    Clicks left: <span id="clickleftStatusBox">0</span><br>' +
+      '    <span id="goalStatusBox"></span><br>' +
       '    </div>' +
       '  <div style="position: relative; float: right; width: 500px;' +
       '              text-align: center; vertical-align: top">' +
@@ -877,6 +898,7 @@ function initializeRecruiter() {
   linkListLength = document.getElementById('linkListLength');
   moraleStatusBox = document.getElementById('moraleStatusBox');
   alreadyClickedStatusBox = document.getElementById('alreadyClickedStatusBox');
+  sessionClicksBox = document.getElementById('sessionClicksBox');
   serverStatusBox = document.getElementById('serverStatus');
 
   modalBackground = document.getElementById('modalBackground');
@@ -1152,21 +1174,26 @@ function extractText(haystack, needle1, needle2) {
 
 function requestQuery(){
 
-var details = {};
-  details.method = 'GET';
-  details.url = mainURL+'yarstats.php?id='+myStatsid;
-  details.onerror = function (responseDetails) {
-    
-  };
-  details.onload = function (responseDetails) {
-        
-	var datas = responseDetails.responseText.split(",");
-        document.getElementById('totalclickStatusBox').textContent = datas[0];
-       document.getElementById('todayclickStatusBox').textContent = datas[1];
-       document.getElementById('clickleftStatusBox').textContent = datas[2];
-        
-  };
-  GM_xmlhttpRequest(details);
+	var details = {};
+	details.method = 'GET';
+	details.url = mainURL+'yarstats2.php?id='+myStatsid;
+	details.onerror = function (responseDetails) { };
+	
+	details.onload = function (r) {
+	
+		var json = $.parseJSON(r.responseText);
+
+		document.getElementById('totalclickStatusBox').textContent = json["totalClicks"];
+		document.getElementById('todayclickStatusBox').textContent = json["todayClicks"];
+		document.getElementById('clickleftStatusBox').textContent = json["clicksLeft"];
+		
+		var goal = json["goal"];
+		var endLine = "<br />\n";
+		var x = "Your tff "+addCommas(goal[1]["tff"])+" is ranked "+addCommas(goal[1]["rank"]) + endLine
+				+ "Above you is <a href='http://www.kingsofchaos.com/stats.php?id="+goal[2]["kocid"]+"'>"+ goal[2]["name"] + "</a> with "+addCommas(goal[2]["tff"]) + endLine;
+		$("#goalStatusBox").html(x);
+	};
+	GM_xmlhttpRequest(details);
 }
 
 try {
