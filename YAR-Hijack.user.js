@@ -72,7 +72,7 @@ var captchaFetchesInProgress = 0;
 var repliesInProgress = 0;
 var isExiting = false;
 var myUsername;
-var mainURL = "http://stats.luxbot.net/api/";
+var mainURL = "http://luxbot.net/stats/api/";
 
 var consecutiveDatabaseErrors = 0;
 
