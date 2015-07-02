@@ -1,10 +1,15 @@
 /*!
 // ==UserScript==
 // @name           YAR-Hijacked!
-// @namespace     http://www.gamerswastelands.co.za/clicker
+// @namespace     http://donatoborrello.com
 // @include        http://www.kingsofchaos.com/recruit.php
 // @include        http://www.kingsofchaos.com/recruit.php?*
-// @require         https://raw.github.com/DonatoB/tofu/master/server/libs/jquery-1.8.3.min.js
+// @require        https://raw.github.com/DonatoB/tofu/master/server/libs/jquery-1.8.3.min.js
+// @grant GM_getValue
+// @grant GM_setValue
+// @grant GM_addStyle
+// @grant GM_xmlhttpRequest
+// @grant GM_log
 // ==/UserScript==
 */
 
@@ -15,7 +20,7 @@ const VERSION = 0;
 // Various debug bar things
 var misloadedImages = 0;
 var invalidResponse = 0;
-
+  
 var myUniqid;
 var myStatsid;
 const REPORT_THRESHOLD = 50;
@@ -992,9 +997,19 @@ function waitForRecaptchaAjaxScriptLoad() {
     return;
   }
 
-  Recaptcha = unsafeWindow.Recaptcha;
+  Recaptcha = new RecaptchaUtil();
 
   whoAmI();
+}
+
+function RecaptchaUtil() {
+	this.create = function () { this.executeJS("Recaptcha.create('6LcvaQQAAAAAACnjh5psIedbdyYzGDb0COW82ruo','recaptchaBox', { theme: 'blackglass' });"); }
+	this.reload = function () { this.executeJS("Recaptcha.reload();"); }
+	this.executeJS = function(js) {
+		var exec = document.body.appendChild(document.createElement("script"));
+		exec.type = "text/javascript";
+		exec.innerHTML = js;
+	}
 }
 
 function whoAmI() {
