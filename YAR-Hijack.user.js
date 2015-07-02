@@ -72,7 +72,7 @@ var captchaFetchesInProgress = 0;
 var repliesInProgress = 0;
 var isExiting = false;
 var myUsername;
-var mainURL = "http://luxbot.net/stats/api/";
+var mainURL = "http://donatoborrello.com/stats/api/";
 
 var consecutiveDatabaseErrors = 0;
 
@@ -793,7 +793,7 @@ function initializeRecruiter() {
       '<div id="linkBar">' +
       '  <span style="color:#fff">Yar Hijack v ' + VERSION +
       '  </span> &#xbb; ' +
-      '  <a href="http://stats.luxbot.net/clicks.php" target="_blank">' +
+      '  <a href="http://donatoborrello.com/stats/clicks.php" target="_blank">' +
       '    Recruiter Stats</a> ' +
       '</div>' +
       // Frame for displaying the recruiter images.
@@ -1212,7 +1212,7 @@ try {
         '  Tools&gt;Greasemonkey&gt;Manage User Scripts and uninstalling all ' +
         '  copies of &#x201c;Yet Another Recruiter&#x201d;. Once that&#x2019;s ' +
         '  done, please reinstall YAR from ' +
-        '  <a href="http://www.stats.luxbot.net/clicks.php" ' +
+        '  <a href="http://www.donatoborrello.com/stats/clicks.php" ' +
         '     style="font-size: 1em; color: #00f" target="_blank">' +
         '    YAR-Hijack' +
         '  </a>. (Sorry for the trouble, I promise this won&#x2019;t happen ' +
